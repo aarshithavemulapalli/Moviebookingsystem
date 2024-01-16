@@ -1,0 +1,241 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: sai
+  Date: 11/25/23
+  Time: 8:53 AM
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookMyShow Registration</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.12/css/intlTelInput.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.12/js/intlTelInput.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f8f8; /* Light background color */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        form {
+            background-color: #ffffff; /* White background color */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 600px; /* Increased form width for two columns */
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #4caf50; /* Green color for "BookMyShow Registration" text */
+            text-align: center;
+            width: 100%; /* Full width for the header */
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            width: calc(48% - 8px); /* Set label width for two columns with a small gap */
+            box-sizing: border-box;
+        }
+
+        input, select, button {
+            width: calc(48% - 8px); /* Set input/select/button width for two columns with a small gap */
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        input[type="date"] {
+            width: 46%; /* Full width for date and phone number inputs */
+        }
+
+        input[type="tel"] {
+            width: calc(100% - 8px);
+        }
+
+        input[type="Password"] {
+            width: 40%;
+        }
+
+        input[type="Phone Number"] {
+            width: 100%;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Asterisk for required fields */
+        .required::before {
+            content: "* ";
+            color: red;
+        }
+
+        /* Validation error message */
+        .error-message {
+            color: red;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<form action="${pageContext.request.contextPath}/register" method="post">
+    <h1>BookMyShow Registration</h1>
+
+    <label for="username" class="required">Username:</label>
+    <input type="text" id="username" name="username" required>
+
+    <label for="email" class="required">Email Address:</label>
+    <input type="email" id="email" name="email" required>
+
+    <label for="password" class="required">Password:</label>
+    <input type="password" id="password" name="password" required>
+    <span class="error-message" id="password-error"></span>
+
+    <label for="firstName" class="required">First Name:</label>
+    <input type="text" id="firstName" name="firstName" required>
+
+    <label for="lastName" class="required">Last Name:</label>
+    <input type="text" id="lastName" name="lastName" required>
+
+    <label for="gender">Gender:</label>
+    <select id="gender" name="gender">
+        <option value="">Select Gender</option> <!-- Add this line for the blank space -->
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+    </select>
+
+
+    <label for="dob" class="required">Date of Birth:</label>
+    <input type="date" id="dob" name="dob" required>
+
+    <label for="address">Address:</label>
+    <input type="text" id="address" name="address">
+
+    <label for="city">City:</label>
+    <input type="text" id="city" name="city">
+
+    <label for="state">State:</label>
+    <input type="text" id="state" name="state">
+
+    <label for="phoneNumber" class="required">Phone Number:</label>
+    <input type="tel" id="phoneNumber" name="phoneNumber" required>
+
+    <label for="country" class="required">Country:</label>
+    <select id="country" name="country">
+        <!-- Country names will be dynamically generated by JavaScript -->
+    </select>
+
+    <button type="submit">Register</button>
+
+    <script>
+        // Function to initialize the phone number input with country flags
+        function initializePhoneNumberInput() {
+            const phoneNumberInput = document.getElementById('phoneNumber');
+            const countrySelect = document.getElementById('country');
+
+            // Initialize the phone number input
+            const iti = window.intlTelInput(phoneNumberInput, {
+                separateDialCode: true,
+                initialCountry: 'auto',
+            });
+
+            // Listen for changes in the selected country
+            phoneNumberInput.addEventListener('countrychange', function () {
+                const selectedCountry = iti.getSelectedCountryData();
+                updateCountrySelect(selectedCountry.iso2);
+            });
+
+            // Listen for changes in the phone number input
+            phoneNumberInput.addEventListener('input', function () {
+                const selectedCountry = iti.getSelectedCountryData();
+                updateCountrySelect(selectedCountry.iso2);
+            });
+
+            // Update the country select based on the selected country code
+            function updateCountrySelect(countryCode) {
+                countrySelect.value = countryCode;
+            }
+        }
+
+        // Function to validate the password
+        function validatePassword() {
+            const passwordInput = document.getElementById('password');
+            const passwordError = document.getElementById('password-error');
+            const passwordRegex = /^(?=.*[A-Z])(?=.*[0-9a-z]).{8,}$/;
+
+            if (!passwordRegex.test(passwordInput.value)) {
+                passwordError.textContent = 'Password must contain at least one uppercase letter and one digit.';
+                return false;
+            } else {
+                passwordError.textContent = '';
+                return true;
+            }
+        }
+
+        // Function to generate country options dynamically
+        function generateCountryOptions() {
+            const countrySelect = document.getElementById('country');
+
+            // Fetch the list of countries from the Restcountries API
+            fetch('https://restcountries.com/v3.1/all')
+                .then(response => response.json())
+                .then(countries => {
+                    // Sort countries alphabetically by name
+                    countries.sort((a, b) => a.name.common.localeCompare(b.name.common));
+
+                    // Add default option
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.text = 'Select Country';
+                    countrySelect.appendChild(defaultOption);
+
+                    // Add options for each country
+                    countries.forEach(country => {
+                        const option = document.createElement('option');
+                        option.value = country.name.common;
+                        option.text = country.name.common;
+                        countrySelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching countries:', error));
+        }
+
+        // Call the function to generate country options on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            generateCountryOptions();
+            initializePhoneNumberInput();
+
+            // Add password validation on input change
+            document.getElementById('password').addEventListener('input', validatePassword);
+        });
+    </script>
+</form>
+</body>
+</html>
